@@ -6,6 +6,13 @@
 - 😄 Pronouns: not very good
 - ⚡ Fun fact: good
 
+Tutorial & Tips
+- [windows tutorial](https://www.mampirklik.com/search/label/Windows)
+- [Office tutorial](https://www.mampirklik.com/search/label/office)
+- [iPhone tutorial](https://www.mampirklik.com/search/label/iPhone))
+- [Android tutorial](https://www.mampirklik.com/search/label/Android)
+
+
 [cmsgue](https://cmsgue.id)
 [mampirklik](https://www.mampirklik.com)
 <!---
