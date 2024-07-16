@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.84.0">
+    <meta name="theme-color" content="#7952b3">
+    <title>Capture attendance</title>
+    <link href="https://getbootstrap.com/docs/5.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+    <style id="camera-css">
+        .camera,.camera video{
+            display:inline-block;
+            margin:auto;
+            object-fit: cover;
+            height:290px!important;
+            width:100%!important;
+        }
+    </style>
+    <style id="leaflet-css">
+        .usermap{
+            min-height:300px;
+            width:100%!important;
+        }
+    </style>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+     
+</head>
+<body>
+<section class="content pb-4">
+    <div class="container-fluid pt-3 pb-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title text-center">Absensi: 01 Jan 2024</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="camera" id="camera" style="height:auto;width:auto;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 pt-3">
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="usermap" id="usermap"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="text-center pb-4">
+                    <span id="latitude">0.00</span>,<span id="longitude">0.00</span><br><span id="distance">0</span>Meter
+                    <input type="text" name="latlong" class="latlong collapse" value="">
+                    <input type="text" name="distance_location" class="distance_location collapse" value="">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<header class="menu-bottom">
+    <nav class="navbar navbar-dark bg-info navbar-expand fixed-bottom">
+    <ul class="navbar-nav nav-justified w-100">
+      <li class="nav-item d-flex justify-content-center align-items-center">
+        <a href="index.html" class="nav-link">
+          <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-house" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M2 13.5V7h1v6.5a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5V7h1v6.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5zm11-11V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
+            <path fill-rule="evenodd" d="M7.293 1.5a1 1 0 0 1 1.414 0l6.647 6.646a.5.5 0 0 1-.708.708L8 2.207 1.354 8.854a.5.5 0 1 1-.708-.708L7.293 1.5z"/>
+          </svg>
+        </a>
+      </li>
+      <li class="nav-item d-flex justify-content-center align-items-center">
+        <a href="izin.html" class="nav-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" fill="currentColor" class="bi bi-clipboard-x" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M6.146 7.146a.5.5 0 0 1 .708 0L8 8.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 9l1.147 1.146a.5.5 0 0 1-.708.708L8 9.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 9 6.146 7.854a.5.5 0 0 1 0-.708"/>
+              <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/>
+              <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/>
+            </svg>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="javascript:void(0);" id="goAttendance" class="nav-link active text-success goAttendance">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" fill="currentColor" class="bi bi-camera" viewBox="0 0 16 16">
+              <path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .707.293l.828.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4z"/>
+              <path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5m0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>
+            </svg>
+        </a>
+      </li>
+      <li class="nav-item d-flex justify-content-center align-items-center">
+        <a href="history.html" class="nav-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" fill="currentColor" class="bi bi-clock-history" viewBox="0 0 16 16">
+              <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022zm2.004.45a7 7 0 0 0-.985-.299l.219-.976q.576.129 1.126.342zm1.37.71a7 7 0 0 0-.439-.27l.493-.87a8 8 0 0 1 .979.654l-.615.789a7 7 0 0 0-.418-.302zm1.834 1.79a7 7 0 0 0-.653-.796l.724-.69q.406.429.747.91zm.744 1.352a7 7 0 0 0-.214-.468l.893-.45a8 8 0 0 1 .45 1.088l-.95.313a7 7 0 0 0-.179-.483m.53 2.507a7 7 0 0 0-.1-1.025l.985-.17q.1.58.116 1.17zm-.131 1.538q.05-.254.081-.51l.993.123a8 8 0 0 1-.23 1.155l-.964-.267q.069-.247.12-.501m-.952 2.379q.276-.436.486-.908l.914.405q-.24.54-.555 1.038zm-.964 1.205q.183-.183.35-.378l.758.653a8 8 0 0 1-.401.432z"/>
+              <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0z"/>
+              <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5"/>
+            </svg>
+        </a>
+      </li>
+      <li class="nav-item d-flex justify-content-center align-items-center">
+        <a href="profile.html" class="nav-link">
+          <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-person" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M10 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js" integrity="sha512-dQIiHSl2hr3NWKKLycPndtpbh5iaHLo6MwrXm7F0FM5e+kL2U16oE9uIwPHUl6fQBeCthiEuV/rzP3MiAB8Vfw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+<script>
+	Webcam.set({
+		width: 320,
+		height: 290,
+		image_format: 'jpeg',
+		jpeg_quality: 90,
+		force_flash: false,
+		flip_horiz: true,
+		fps: 45
+	});
+    Webcam.attach('#camera');
+
+    const absen = document.querySelector('.goAttendance');
+    absen.addEventListener('click', function(event) {
+		let image = '';
+		Webcam.snap( function(data_uri) {
+			image = data_uri;
+		});
+		
+		if(!image){
+		    alert('Silahkan untuk capture foto!')   
+		    return false
+		}	
+		
+		let latlng = document.querySelector('.latlong')
+		let distance_location = document.querySelector('.distance_location')
+		
+		event.preventDefault();
+    });
+</script>
+<script>
+    const options = {
+      enableHighAccuracy: true,
+      //desiredAccuracy:500,
+      maximumAge: 10000,
+      timeout: 5000,
+    };
+
+    const successCallback = (position) => {
+        let lat = position.coords.latitude;
+        let long = position.coords.longitude;
+        let accuracy = position.coords.accuracy;
+        
+        //latlong fix
+        // coord_lat = lat.toFixed(2);
+        // coord_long =long.toFixed(2);
+        
+        let latSpan = document.querySelector('#latitude');
+        let longSpan = document.querySelector('#longitude');
+        
+        latSpan.innerText = lat;
+        longSpan.innerText = long;
+        
+        if(lat){
+            let _lokasiUser = lat+','+long;
+            var map = L.map('usermap').setView([lat,long],15);
+            
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            var marker_user = L.marker([lat,long]).addTo(map);
+            
+            //circle office
+            let officeLat = -6.2291955;
+            let officeLong = 106.8066523;
+            let _lokasiKantor = officeLat+','+officeLong;
+            
+            var greenIcon = L.icon({
+                iconUrl: 'icons8-office-96.png',
+            
+                iconSize:     [38, 38], // size of the icon
+            });
+            var marker_office = L.marker([officeLat,officeLong],{icon:greenIcon}).addTo(map);
+            var circle = L.circle([officeLat,officeLong], {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0.3,
+                radius: 600
+            }).addTo(map);
+            
+            //distance
+            let _length = map.distance(marker_office.getLatLng(), marker_user.getLatLng());
+            let distance = document.querySelector('#distance');
+            distance.innerText = _length.toFixed(2);
+            
+            //set value
+            let latlong = document.querySelector('.latlong');
+            latlong.value = marker_user.getLatLng();
+            
+            let distance_location = document.querySelector('.distance_location');
+            distance_location.value = _length.toFixed(2);
+        }
+    };
+    
+    const errorCallback = (error) => {
+      console.log(error);
+    };   
+    
+    //initialize
+    if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(
+            successCallback,
+            errorCallback,
+            options
+        ); 
+    }else{
+        alert("Absensi diperlukan kamera, dan lokasi aktif!");
+    }
+</script>
+</body>
+</html>
